@@ -1,0 +1,27 @@
+Linux4SAM demo Production
+--------------
+  Auto flash the demo binaries(at91bootstrap, u-boot, kernel) into spi flash, rootfs into eMMC partition.
+
+Source to build:
+--------------
+repository:
+     git://rfolxts01.rfo.atmel.com/buildroot
+
+tag: 
+     sama5d2_xplained_production_v0.3
+
+commit:
+     1a674b7 destroy the partition table for sure
+
+Steps:
+--------------
+1. Format a SD card as FAT32 partition
+2. Insert the SD card, and copy all alpha5 demo files to SD card.
+	cp linux4sam-poky-sama5d2_xplained-5.0-alpha5/* /media/xxx
+3. Copy all files in current folder to SD card.
+	cp * /media/xxx
+	NOTE: the u-boot-env.bin will overwrite alpha release's u-boot-env.bin
+	file. The only change is use mmcblk0p1 as the rootfs.
+4. Insert SD card to board, and reset the board.
+5. Waiting for 6 minitues, and if the board's LED change to green, then flash process is successful.
+6. Inject the SD card and reboot the board.

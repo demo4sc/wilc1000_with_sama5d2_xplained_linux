@@ -1,0 +1,162 @@
+Linux4SAM demo
+--------------
+
+This is a Linux4SAM demo version: linux4sam_5.0-alpha5
+
+0. Linux kernel drivers
+-----------------------
+
+   * 3.18 Linux kernel
+   * DDR3 (needed for Linux!)
+   * L2 cache
+   * VFP + NEON support
+   * EDBG (Serial console tested with EDBG firmware version 2.9.349)
+   * Shutdown controller
+   * Reset controller
+   * Periodic Interval Timer (PIT)
+   * Timer Counter
+   * RTC
+   * Watchdog
+   * DMA
+   * Serial driver UART with DMA
+   * I2c High Speed with DMA
+   * SPI with DMA
+   * serial flash (SPI - at25)
+   * QSPI with DMA (disabled in Device Tree by default)
+   * Flexcom with FIFO & DMA
+     * USART interface
+     * I2C interface
+     * SPI interface
+     => Flexcom0 as USART and Flexcom4 as I2C
+   * SD/MMC interface (SDHCI)
+     * SD/MMC connector
+     * on-board eMMC
+   * Ethernet
+   * USB: host (OHCI & EHCI)
+   * USB: device/gadget high speed
+   * LCD base layer / LCD overlay 1, 2 / LCD High End Overlay
+     * PDA 4" screen supported
+       * Capacitive touchscreen maXTouch - PDA module
+       * Touch button QT1070 - PDA module
+   * Pinctrl + GPIO (PIO muxing, PIO control and configuration)
+   * Audio using Class D amplifier
+   * USER button
+   * LEDs
+   * ISC
+     * support YUV sensor output
+     * support RGB output format
+   * Crypto engines
+     * AEAD support for IPSec
+   * Adapted to the production board revision
+
+
+1. Source code used to build the demo
+-------------------------------------
+
+AT91Bootstrap
+*************
+Git tree: https://github.com/linux4sam/at91bootstrap
+Branch: at91bootstrap-3.x
+Tag: AT91Bootstrap 3.8-alpha5 (Fri Aug 21 10:23:12 CEST 2015)
+
+U-Boot
+******
+Git tree: https://github.com/linux4sam/u-boot-at91
+Branch: u-boot-2015.01-at91
+Tag: U-Boot 2015.01-linux4sam_5.0-alpha5 (Aug 21 2015 - 10:22:58)
+
+Linux kernel
+************
+Git tree: https://github.com/linux4sam/linux-at91
+Branch: linux-3.18-at91
+Tag: Linux version 3.18.0-linux4sam_5.0-alpha5 (ldesroches@ibiza) (gcc version 4.9.2 (GCC) ) #1 Fri Aug 21 17:12:06 CEST 2015
+
+Yocto project layer
+*******************
+Git tree: https://github.com/linux4sam/meta-atmel
+Branch: fido
+Tag: linux4sam_5.0-alpha5
+Recipe used for image: atmel-xplained-demo-image
+
+
+2. Documentation to build demo from sources
+-------------------------------------------
+All documentation can be found on the Linux4SAM website:
+http://www.linux4sam.org
+
+
+3. serial console parameters
+----------------------------
+The serial console must be configured with the following parameters:
+
+57600 8-N-1:
+    Baud rate	57600
+    Data	8 bits
+    Parity	None
+    Stop	1 bit
+    Flow ctrl	None
+
+For this early release, we advice you to use a FTDI USB-to-serial cable
+connected to the DEBUG port on the sama5d2 Xplained board (J1).
+
+
+4. Store root filesystem on a SD card
+-------------------------------------
+The default boot environment is built to run form the first partition of an
+ext4 formated SD card.
+Note: this operation is risky for your development host: you can simply crash
+your system. Please pay attention while running these actions.
+
+a/ format the SD card as an ext4 volume
+
+b/ mount the SD card on your host
+
+c/ as superuser, extract the rootfs archive on the SD card:
+# cd <SD card mount point>
+# sudo tar xvaf atmel-xplained-demo-image-sama5d2-xplained.tar.gz
+
+d/ unmount the SD card to synchronize its content
+# umount <SD card mount point>
+
+e/ insert the SD card in the board's SDHCI1 slot (J19)
+
+
+5. Store bootloaders and Linux kernel on SPI flash
+--------------------------------------------------
+a/ install SAM-BA 3 on your host
+
+b/ reset the board with BOOT_DIS jumper closed (JP7)
+
+c/ open the BOOT_DIS jumper
+
+d/ make sure that you can write to the AT91 USB connection (USB CDC SAM-BA
+access):
+# ls -l /dev/ttyACM0
+crw-rw---- 1 root dialout 166, 0 juin  24 14:35 /dev/ttyACM0
+For example, if you are not part of the "dialout" group, add yourself in it to
+be able to send data to this port.
+
+e/ run the sam-ba script to flash the board:
+# ./write-serialflash-usb.sh
+
+f/ reset the board (BP3)
+
+Note: The boot parameters stay in backup registers for a few minutes. After that,
+you must re-program these register to be able to boot from the SPI flash.
+You can use the following command to re-program these boot registers:
+# sambacmd -x write-boot_sequence-usb.qml
+
+
+6. Known limitations
+--------------------
+
+* Some features are not supported by this early delivery
+   * EDBG (JTAG)
+   * ADC
+   * PWM
+   * CAN-FD
+   * NAND flash with hardware ECC and DMA support
+   * PTC
+   * Audio using SSC/I2S
+   * Power management
+   * PMIC - battery management

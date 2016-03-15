@@ -1,4 +1,0 @@
-#!/bin/sh
-
-BASEDIR=/work_folder/ssw/sama5d2/kernel_3.18/samba-3.0-pre3
-LD_LIBRARY_PATH=$BASEDIR/libs $BASEDIR/libs/sambacmd.bin $*

@@ -1,8 +1,0 @@
-baudrate=57600
-bootargs=console=ttyS0,57600 root=/dev/mmcblk0p1 rw rootfstype=ext4 rootwait
-bootcmd=sf probe 0; sf read 0x21000000 0x60000 0xc000; sf read 0x22000000 0x6c000 0x394000; bootz 0x22000000 - 0x21000000
-bootdelay=1
-ethact=gmac0
-stderr=serial
-stdin=serial
-stdout=serial
